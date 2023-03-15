@@ -176,12 +176,7 @@ find_first_match(WantedProto, [Head | RemainingProtos]) ->
     end.
 
 is_wanted_proto(WantedProto, ProtoPath) ->
-    case string:sub_string(ProtoPath, length(ProtoPath) - length(WantedProto) + 1) of
-        WantedProto ->
-            true;
-        _Other ->
-            false
-    end.
+    WantedProto == string:sub_string(ProtoPath, length(ProtoPath) - length(WantedProto) + 1).
 
 filter_unwanted_protos(WantedProtos, AllProtos) ->
     [find_first_match(WantedProto, AllProtos) || WantedProto <- WantedProtos].

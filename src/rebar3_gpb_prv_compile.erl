@@ -24,13 +24,17 @@
 -spec init(rebar_state:t()) -> {ok, rebar_state:t()}.
 init(State) ->
     Provider =
-        providers:create([{name, ?PROVIDER},            % The 'user friendly' name of the task
+        providers:create([%% The 'user friendly' name of the task
+                          {name, ?PROVIDER},
                           {namespace, protobuf},
-                          {module, ?MODULE},            % The module implementation of the task
-                          {bare,
-                           true},                 % The task can be run by the user, always true
-                          {deps, ?DEPS},                % The list of dependencies
-                          {opts, []},                   % list of options understood by the plugin
+                          %% The module implementation of the task
+                          {module, ?MODULE},
+                          %% The task can be run by the user, always true
+                          {bare, true},
+                          %% The list of dependencies
+                          {deps, ?DEPS},
+                          %% list of options understood by the plugin
+                          {opts, []},
                           {example, "rebar3 protobuf compile"},
                           {short_desc, ?SHORT_DESC},
                           {desc, ?DESC}]),

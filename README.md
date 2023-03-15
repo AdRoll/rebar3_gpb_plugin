@@ -1,7 +1,7 @@
 Rebar3 gpb plugin
 =====
 
-![](https://github.com/lrascao/rebar3_gpb_plugin/workflows/Common%20Test/badge.svg)
+[![Build Status](https://github.com/AdRoll/rebar3_gpb_plugin/actions/workflows/erlang.yml/badge.svg)](https://github.com/AdRoll/rebar3_gpb_plugin)
 
 A rebar3 plugin for automatically compiling .proto files using the gpb protobuf compiler
 

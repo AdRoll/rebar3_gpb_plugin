@@ -1,17 +1,12 @@
-{application, rebar3_gpb_plugin, [
-        {description, "A rebar3 gpb plugin for compiling .proto files"},
-        {vsn, git},
-        {registered, []},
-        {applications,
-            [
-                kernel,
-                stdlib,
-                gpb
-            ]},
-        {env,[]},
-        {modules, []},
-        {pkg_name, nextroll_rebar3_gpb_plugin},
-        {maintainers, ["NextRoll"]},
-        {licenses, ["MIT"]},
-        {links, [{"Github", "https://github.com/AdRoll/rebar3_gpb_plugin"}]}
-    ]}.
+{application,
+ rebar3_gpb_plugin,
+ [{description, "A rebar3 gpb plugin for compiling .proto files"},
+  {vsn, git},
+  {registered, []},
+  {applications, [kernel, stdlib, gpb]},
+  {env, []},
+  {modules, []},
+  {pkg_name, nextroll_rebar3_gpb_plugin},
+  {maintainers, ["NextRoll"]},
+  {licenses, ["MIT"]},
+  {links, [{"Github", "https://github.com/AdRoll/rebar3_gpb_plugin"}]}]}.

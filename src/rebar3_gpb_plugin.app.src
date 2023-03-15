@@ -1,6 +1,6 @@
 {application, rebar3_gpb_plugin, [
         {description, "A rebar3 gpb plugin for compiling .proto files"},
-        {vsn, "2.22.6"},
+        {vsn, git},
         {registered, []},
         {applications,
             [
@@ -10,6 +10,7 @@
             ]},
         {env,[]},
         {modules, []},
+        {pkg_name, nextroll_rebar3_gpb_plugin},
         {maintainers, ["Luis Rascao"]},
         {licenses, ["MIT"]},
         {links, [{"Github", "https://github.com/lrascao/rebar3_gpb_plugin"}]}

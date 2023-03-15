@@ -2,7 +2,6 @@
 
 -export([compile/2, clean/2]).
 
--define(DEFAULT_PROTO_DIR, "proto").
 -define(DEFAULT_OUT_ERL_DIR, "src").
 -define(DEFAULT_OUT_HRL_DIR, "include").
 -define(DEFAULT_OUT_NIF_DIR, "priv").

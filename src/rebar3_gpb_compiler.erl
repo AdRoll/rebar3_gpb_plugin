@@ -22,12 +22,9 @@ compile(AppInfo, State) ->
     Recursive = proplists:get_value(recursive, GpbOpts0, true),
     SourceDirs = proplists:get_all_values(i, GpbOpts0),
 
-    TargetErlDir =
-        filename:join([AppOutDir, proplists:get_value(o_erl, GpbOpts0, ?DEFAULT_OUT_ERL_DIR)]),
-    TargetHrlDir =
-        filename:join([AppOutDir, proplists:get_value(o_hrl, GpbOpts0, ?DEFAULT_OUT_HRL_DIR)]),
-    TargetNifDir =
-        filename:join([AppOutDir, proplists:get_value(o_nif_cc, GpbOpts0, ?DEFAULT_OUT_NIF_DIR)]),
+    TargetErlDir = target_dir(AppOutDir, o_erl, GpbOpts0, ?DEFAULT_OUT_ERL_DIR),
+    TargetHrlDir = target_dir(AppOutDir, o_hrl, GpbOpts0, ?DEFAULT_OUT_HRL_DIR),
+    TargetNifDir = target_dir(AppOutDir, o_nif_cc, GpbOpts0, ?DEFAULT_OUT_NIF_DIR),
 
     rebar_api:debug("making sure that target erl dir ~p exists", [TargetErlDir]),
     ok = ensure_dir(TargetErlDir),
@@ -40,10 +37,8 @@ compile(AppInfo, State) ->
                     [SourceDirs, TargetErlDir, TargetHrlDir]),
     %% search for .proto files
     FoundProtos =
-        lists:foldl(fun ({deps, SourceDir}, Acc) ->
-                            Acc ++ discover(DepsDir, SourceDir, [{recursive, Recursive}]);
-                        (SourceDir, Acc) ->
-                            Acc ++ discover(AppDir, SourceDir, [{recursive, Recursive}])
+        lists:foldl(fun(SourceDir, Acc) ->
+                       find_protos_in_dir(SourceDir, AppDir, DepsDir, Recursive, Acc)
                     end,
                     [],
                     SourceDirs),
@@ -68,15 +63,13 @@ compile(AppInfo, State) ->
     %% set the full path for the output directories
     %% add to include path dir locations of the protos
     %% remove the plugin specific options since gpb will not understand them
+    GpbOpts1 = target_nif_opt(TargetNifDir, GpbOpts0),
+    GbpOpts2 = target_hrl_opt(TargetHrlDir, GpbOpts1),
+    GbpOpts3 = target_erl_opt(TargetErlDir, GbpOpts2),
     GpbOpts =
         remove_plugin_opts(proto_include_paths(AppDir,
                                                Protos,
-                                               default_include_opts(AppDir,
-                                                                    DepsDir,
-                                                                    target_erl_opt(TargetErlDir,
-                                                                                   target_hrl_opt(TargetHrlDir,
-                                                                                                  target_nif_opt(TargetNifDir,
-                                                                                                                 GpbOpts0)))))),
+                                               default_include_opts(AppDir, DepsDir, GbpOpts3))),
 
     compile(Protos, TargetErlDir, GpbOpts, Protos),
     ok.
@@ -136,12 +129,12 @@ compile([Proto | Rest], TargetErlDir, GpbOpts, Protos) ->
                                  %% the plugin into believing that the proto is more recent than the
                                  %% target, this means we need to set the last changed time on the
                                  %% target to a time earlier than the proto
-                                 Seconds =
+                                 LastModifiedGSecs =
                                      calendar:datetime_to_gregorian_seconds(
-                                         filelib:last_modified(Dep))
-                                     - 60,
-                                 _ = file:change_time(DepTarget,
-                                                      calendar:gregorian_seconds_to_datetime(Seconds)),
+                                         filelib:last_modified(Dep)),
+                                 Seconds = LastModifiedGSecs - 60,
+                                 FakeLastModified = calendar:gregorian_seconds_to_datetime(Seconds),
+                                 _ = file:change_time(DepTarget, FakeLastModified),
                                  rebar_api:debug("touched ~p", [DepTarget])
                               end,
                               Deps0),
@@ -282,3 +275,16 @@ proto_include_paths(_AppDir, [], Opts) ->
 proto_include_paths(AppDir, [Proto | Protos], Opts) ->
     ProtoDir = filename:join([AppDir, filename:dirname(Proto)]),
     proto_include_paths(AppDir, Protos, Opts ++ [{i, ProtoDir}]).
+
+target_dir(AppOutDir, Key, GpbOpts, DefaultValue) ->
+    filename:join([AppOutDir, proplists:get_value(Key, GpbOpts, DefaultValue)]).
+
+find_protos_in_dir(SourceDir0, AppDir, DepsDir, Recursive, Acc) ->
+    {SourceDir, AppOrDepsDir} =
+        case SourceDir0 of
+            {deps, DepDir} ->
+                {DepDir, DepsDir};
+            _ ->
+                {SourceDir0, AppDir}
+        end,
+    Acc ++ discover(AppOrDepsDir, SourceDir, [{recursive, Recursive}]).

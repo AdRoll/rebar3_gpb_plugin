@@ -11,7 +11,6 @@
         {env,[]},
         {modules, []},
         {pkg_name, nextroll_rebar3_gpb_plugin},
-        {maintainers, ["Luis Rascao"]},
         {licenses, ["MIT"]},
-        {links, [{"Github", "https://github.com/lrascao/rebar3_gpb_plugin"}]}
+        {links, [{"Github", "https://github.com/AdRoll/rebar3_gpb_plugin"}]}
     ]}.
